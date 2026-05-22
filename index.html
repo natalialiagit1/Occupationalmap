@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Brickell Tower 1 — Unit Management & Occupancy Map</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f6f8;padding:24px;color:#222}
+.page{max-width:1150px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.10);padding:28px 32px 32px}
+.header{text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid #e2e6ea}
+.header h1{font-size:22px;font-weight:700;color:#1a2744;letter-spacing:.04em;text-transform:uppercase}
+.header p{font-size:11px;color:#7a8499;margin-top:4px;letter-spacing:.1em;text-transform:uppercase}
+.body{display:flex;gap:20px;align-items:flex-start}
+.map-area{flex:1;min-width:0;overflow-x:auto}
+.sidebar{width:220px;flex-shrink:0}
+.col-hd{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.ch-fl{width:38px;font-size:8.5px;font-weight:700;color:#aab0be;text-align:center;letter-spacing:.08em;text-transform:uppercase}
+.ch-un{font-size:8.5px;font-weight:700;color:#aab0be;letter-spacing:.08em;text-transform:uppercase}
+.sec-hd{font-size:8px;font-weight:700;letter-spacing:.14em;color:#aab0be;margin:8px 0 4px 43px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.sec-hd::after{content:'';flex:1;height:1px;background:#e8eaee}
+.fr{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.fn{width:38px;text-align:center;font-size:11px;font-weight:700;color:#4a5568;flex-shrink:0;background:#f0f2f5;border-radius:4px;padding:3px 0;line-height:1.3}
+.ur{display:flex;gap:3px}
+.u{width:62px;padding:5px 3px 4px;border-radius:4px;text-align:center;flex-shrink:0;cursor:pointer;transition:filter .15s,transform .15s,box-shadow .15s;outline:2px solid transparent}
+.u:hover{filter:brightness(1.1);transform:scale(1.05);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.u.selected{outline:2.5px solid #1a2744;transform:scale(1.07);box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.un{font-size:9px;font-weight:700;line-height:1.3;pointer-events:none}
+.ut{font-size:7.5px;font-weight:500;line-height:1.2;margin-top:1.5px;opacity:.88;pointer-events:none}
+.pool{display:flex;align-items:center;gap:5px;margin:10px 0}
+.pool-n{width:38px;text-align:center;font-size:9px;font-weight:700;color:#2563b0;flex-shrink:0}
+.pool-b{flex:1;background:#dbeafe;border-radius:4px;padding:7px 10px;font-size:9.5px;font-weight:700;color:#1a4d8f;text-align:center;letter-spacing:.06em;text-transform:uppercase}
+.tot{text-align:center;margin-top:8px;font-size:10px;font-weight:700;color:#4a5568;padding:6px;background:#f0f2f5;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}
+.detail-card{background:#f8f9fb;border:1px solid #e2e6ea;border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.detail-empty{background:#f8f9fb;border:1px dashed #d0d5de;border-radius:8px;padding:16px 14px;margin-bottom:14px;text-align:center;font-size:10px;color:#9aa0ae;line-height:1.6}
+.d-unit-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px}
+.d-unit-num{font-size:16px;font-weight:700;color:#1a2744}
+.d-badge{display:inline-block;padding:3px 8px;border-radius:10px;font-size:9px;font-weight:700;white-space:nowrap}
+.d-div{height:1px;background:#e2e6ea;margin:8px 0}
+.d-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;gap:8px}
+.d-label{font-size:9.5px;color:#7a8499;white-space:nowrap}
+.d-value{font-size:10px;font-weight:600;color:#2d3748;text-align:right;word-break:break-word;max-width:130px}
+.d-section{margin-top:8px;padding-top:8px;border-top:1px solid #e2e6ea}
+.d-section-hd{font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aab0be;margin-bottom:5px}
+.d-owner-val{font-size:10.5px;font-weight:600;color:#1a2744;line-height:1.45;word-break:break-word}
+.d-email{font-size:9px;color:#2563b0;word-break:break-all;margin-top:2px}
+.d-phone{font-size:10px;font-weight:700;color:#16a34a;margin-top:3px}
+.side-hd{font-size:9px;font-weight:700;color:#7a8499;letter-spacing:.12em;margin-bottom:8px;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid #e8eaee}
+.li{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.ls{width:18px;height:18px;border-radius:3px;flex-shrink:0}
+.ll{font-size:10.5px;font-weight:600;color:#2d3748}
+.lc{font-size:9px;color:#8a93a6}
+.sum-hd{font-size:9px;font-weight:700;color:#7a8499;letter-spacing:.12em;margin:16px 0 8px;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid #e8eaee}
+.sr{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.sd{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.sn{font-size:10px;color:#2d3748;flex:1;font-weight:600}
+.sc{font-size:10px;font-weight:700;color:#2d3748}
+.sp{font-size:9px;color:#8a93a6;min-width:28px;text-align:right}
+.bw{height:3px;background:#eef0f4;border-radius:2px;margin-bottom:5px;overflow:hidden}
+.bf{height:100%;border-radius:2px}
+.stot{padding-top:8px;border-top:1px solid #e8eaee;margin-top:4px;font-size:10px;font-weight:700;color:#1a2744}
+.footer{text-align:center;margin-top:20px;padding-top:14px;border-top:1px solid #e8eaee;font-size:9px;color:#aab0be;letter-spacing:.06em}
+@media print{body{background:#fff;padding:0}.page{box-shadow:none;border-radius:0;padding:16px 20px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>Smart Brickell Tower 1</h1>
+    <p>Unit Management &amp; Occupancy Diagram &nbsp;|&nbsp; 229 SW 9th Street, Miami, FL 33130</p>
+  </div>
+  <div class="body">
+    <div class="map-area">
+      <div class="col-hd"><div class="ch-fl">Floor</div><div class="ch-un">Units &amp; Type</div></div>
+      <div id="map"></div>
+      <div class="tot">Total: 100 Units</div>
+    </div>
+    <div class="sidebar">
+      <div id="detail-area"><div class="detail-empty">Click any unit<br>to view its details</div></div>
+      <div class="side-hd">Legend</div>
+      <div id="legend"></div>
+      <div class="sum-hd">Summary</div>
+      <div id="summary"></div>
+    </div>
+  </div>
+  <div class="footer">Smart Brickell Condominium Association, Inc. &nbsp;|&nbsp; Habitat Hotel Development LLC &nbsp;|&nbsp; Confidential — Internal Use Only</div>
+</div>
+<script>
+const P={
+  V:{label:'Vibras managed',color:'#27AE60',tc:'#fff'},
+  OD:{label:'Owner direct',color:'#8D9DB6',tc:'#fff'},
+  HP:{label:'Hotel program',color:'#E8742A',tc:'#fff'},
+  LB:{label:'Leaseback',color:'#F9D84A',tc:'#6B4E00'},
+  R:{label:'Renter',color:'#85D4A0',tc:'#145228'},
+  OC:{label:'Owner occupancy',color:'#BFC9CA',tc:'#3A4850'},
+};
+const D={
+  "1101":{o:"Natco Investments LLC",sqf:570},
+  "1102":{o:"Maria Florencia Quiroga Roca / Why Not 1102 LLC",sqf:570},
+  "1103":{o:"Monica Lopez",pm:"Felipe Lopez",pmc:"Felipe Lopez",pme:"afvallejo@hotmail.com",pmp:"(311) 388-1080",sqf:564},
+  "1104":{o:"Blue Palm Capital LLC",sqf:494},
+  "1105":{o:"Proacor International LLC",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:516},
+  "1201":{o:"Fabian Idrovo",sqf:570},
+  "1202":{o:"Trento LLC",sqf:570},
+  "1203":{o:"Jefred Velez Gutierrez & Maizel Aguilar / Velez Maiz Property Mgmt Inc.",sqf:564},
+  "1204":{o:"Sievilla / Nuevos Due\u00f1os",sqf:494},
+  "1205":{o:"MIA2023 LLC",sqf:516},
+  "1401":{o:"Sergio Ricciardi",pm:"Hey Miami",pmc:"Hey Miami",pme:"info@hey-miami.com",sqf:570},
+  "1402":{o:"Gisella Rivera",sqf:570},
+  "1403":{o:"German Morales",sqf:564},
+  "1404":{o:"Blue Palm Capital LLC",sqf:494},
+  "1405":{o:"Lakshmi 897, LLC",pm:"Irina Mendez",pmc:"Irina Mendez",pme:"irina.mdez@gmail.com",pmp:"(786) 620-1665",sqf:516},
+  "1501":{o:"Flomi International LLC",sqf:570},
+  "1502":{o:"Corina",sqf:570},
+  "1503":{o:"Rosa Maria Neme",sqf:564},
+  "1504":{o:"Yamile Villalobos",sqf:494},
+  "1505":{o:"Rose Property Rentals, LLC",sqf:516},
+  "1601":{o:"Juan Alberto Galindo Restrepo",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:570},
+  "1602":{o:"Catalina Monsalve",pm:"ZEDULE",pmc:"Catalina Monsalve",pme:"catalina@whitefeathermgt.com",sqf:570},
+  "1603":{o:"Patagonian Mission LLC",pm:"Cielo Stays",pmc:"Jose Miori",pme:"jose@cielostays.com",pmp:"(954) 552-5699",sqf:564},
+  "1604":{o:"Blue Palm Capital LLC",sqf:494},
+  "1605":{o:"Yady Vanexa Rojas (Vanexa LLC)",sqf:516},
+  "1701":{o:"Jose Luis Nassar Peters",sqf:570},
+  "1702":{o:"Sebastian Garces Lopez",pm:"Estefania Botero Londono",pmc:"Estefania Botero Londono",pme:"estefa-b@hotmail.com",pmp:"+57 310-843-0058",sqf:570},
+  "1703":{o:"Qori593 LLC",sqf:564},
+  "1704":{o:"Regina Yunes de Garcia",pm:"Regina",pmc:"Regina",pme:"mayrayunes@gmail.com",pmp:"+502 5704-1226",sqf:494},
+  "1705":{o:"Smart 1705 LLC",sqf:516},
+  "1801":{o:"Carolina Velez & Alejandro Bernal",sqf:906},
+  "1802":{o:"Four United LLC",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:1064},
+  "1901":{o:"Z & U Med, LLC",pm:"Alexandra",pmc:"Alexandra",pme:"smartbrickell1901@outlook.com",pmp:"(954) 278-4682",sqf:906},
+  "1902":{o:"Juan Guillermo Mancera",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:1064},
+  "2001":{o:"Octomel LLC",sqf:571},
+  "2002":{o:"Hector L Sanchez",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:571},
+  "2003":{o:"Giseth Bustos",pm:"Shorehouse Management",pmc:"Cory Friedman",pme:"shorehousemanagement@gmail.com",pmp:"(561) 271-3175",sqf:809},
+  "2004":{o:"Maria A Marques Da Rosa Reis",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:742},
+  "2101":{o:"Blue Palm Capital LLC",sqf:571},
+  "2102":{o:"Blue Palm Capital LLC",sqf:571},
+  "2103":{o:"Gusmart Internacional LLC",sqf:809},
+  "2104":{o:"Eduardo Rivera",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:742},
+  "2201":{o:"Silvia Londono",sqf:571},
+  "2202":{o:"Arnold Perry",pmc:"Jose Luis Barreiro",pme:"joseluisbarreiro@gmail.com",pmp:"(941) 726-7943",sqf:571},
+  "2203":{o:"Jose Alberto Jaramillo & Leonardo Jaramillo",sqf:809},
+  "2204":{o:"Julita Properties Inc",sqf:742},
+  "PH 2301":{o:"El Brinco 05 LLC",pm:"Cielo Stays",pmc:"Jose Miori",pme:"jose@cielostays.com",sqf:571},
+  "PH 2302":{o:"Wolfgang Ledwon & Pilar Soria",sqf:571},
+  "PH 2303":{o:"Blue Palm Capital LLC",sqf:809},
+  "PH 2304":{o:"Linda Sofia LLC",sqf:742},
+  "201":{o:"Alvaro Gilibert",pm:"Park Place Miami",pmc:"Jessiana Escontrela",pme:"jessie@parkpl.co",pmp:"(305) 240-8919",sqf:449},
+  "202":{o:"Hesed Investments, LLC",pm:"Vini Araujo",pmc:"Vini Araujo",pme:"viniaraujo.pm@gmail.com",pmp:"(786) 683-0609",sqf:406},
+  "203":{o:"Ernesto Antonio Villaescusa Lopez",sqf:390},
+  "204":{o:"Mario Eleodoro Valdovinos Jofre",sqf:392},
+  "205":{o:"Javier Andres Chingual Garcia & Camila Pinedo Toledo",pm:"Casa Palma",pmc:"Evelyn",pme:"casapalma261@gmail.com",pmp:"(786) 260-3405",sqf:407},
+  "206":{o:"Juan Carlos Benavides Carrillo",sqf:392},
+  "207":{o:"Hector Omar Donaire",pm:"Park Place Miami",pmc:"Jessiana Escontrela",pme:"jessie@parkpl.co",pmp:"(305) 240-8919",sqf:390},
+  "208":{o:"Justin Vidal Barton",sqf:409},
+  "209":{o:"Victor Wenceslao Ariza Gonzalez",pm:"Anne Enterprises LLC",pmc:"Eduardo Viana",pme:"annecorpflorida@gmail.com",pmp:"(754) 715-0081",sqf:450},
+  "301":{o:"Smart Brickell 301 LLC",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:449},
+  "302":{o:"Hc Urbano LLC",sqf:406},
+  "303":{o:"Chelsea & Co. LLC",sqf:390},
+  "304":{o:"Bay Tower LLC",sqf:392},
+  "305":{o:"Blue Palm Capital LLC",sqf:407},
+  "306":{o:"International Plati Group LLC",sqf:392},
+  "307":{o:"Alberto Barros",sqf:390},
+  "308":{o:"Jenivesa LLC",sqf:409},
+  "309":{o:"Blue Palm Capital LLC",sqf:450},
+  "401":{o:"International Plati Group LLC",sqf:541},
+  "402":{o:"Grenelle LLC",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:418},
+  "403":{o:"Daniel Carlos Pellegrino",sqf:424},
+  "404":{o:"Jean Carlos Quintero Navas",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:484},
+  "405":{o:"Jappi Investments LLC",sqf:484},
+  "406":{o:"Leonardo Francisco Crespo",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:427},
+  "407":{o:"Jorge Mario Rios Giraldo",pm:"Park Place Miami",pmc:"Jessiana Escontrela",pme:"jessie@parkpl.co",pmp:"(305) 240-8919",sqf:419},
+  "408":{o:"NL Investors LLC",sqf:538},
+  "501":{o:"Corrcapital LLC",pm:"Yourhome Hospitality",pmc:"Riad Fayad",pme:"rfayad@yourhomehospitality.com",sqf:541},
+  "502":{o:"Jorge Hugo Parada Mendez",pm:"Stay Sol",pmc:"Jonatan",pme:"jonatan@staysol.com",pmp:"(786) 403-0550",sqf:418},
+  "503":{o:"Madison Bould",pm:"Palermo Home",pmc:"Diana Bernal",pme:"diana@palermohomerentals.com",pmp:"(305) 724-2410",sqf:424},
+  "504":{o:"Jean Carlos Quintero Navas",pm:"WeHost",pmc:"Oscar Guerrero",pme:"dortiz@wehostgroup.co",pmp:"(561) 890-4065",sqf:484},
+  "505":{o:"Gzd Investments LLC",pm:"Park Place Miami",pmc:"Jessiana Escontrela",pme:"jessie@parkpl.co",pmp:"(305) 240-8919",sqf:484},
+  "506":{o:"Magnify Md LLC",pm:"Host & Keep",pmc:"Caroline Ramos",pme:"caroline@hostandkeep.com",sqf:427},
+  "507":{o:"Enrique Solis & Rosalba Garcia",pmc:"Laura",sqf:419},
+  "508":{o:"Invest Housing LLC",sqf:538},
+  "601":{o:"Aiyfd Investments LLC",sqf:541},
+  "602":{o:"Blue Palm Capital LLC",sqf:418},
+  "603":{o:"Steve Tsaley & Iren Tsaley",sqf:424},
+  "604":{o:"Frederick Randall Good",pm:"Randy Good",pmc:"Randy Good",pme:"rgood126@gmail.com",pmp:"(720) 220-6607",sqf:484},
+  "605":{o:"Firefly America LLC",sqf:484},
+  "606":{o:"Jenny Carolina Aguirre Naula",sqf:427},
+  "607":{o:"3G Capital Partners LLC",pm:"Ammos",pmc:"Gonzalo Gambertoglio",pme:"gon@ammosfl.com",sqf:419},
+  "608":{o:"Tryeza LLC",sqf:538},
+  "701":{o:"Rgg Investments LLC",sqf:541},
+  "702":{o:"David Hernan Maestre Castro / Brickell & Chimila LLC",sqf:418},
+  "703":{o:"3G Capital Partners LLC",pm:"Ammos",pmc:"Gonzalo Gambertoglio",pme:"gon@ammosfl.com",sqf:424},
+  "704":{o:"Kintsukuroi LLC",sqf:484},
+  "705":{o:"Raul Francisco",sqf:484},
+  "706":{o:"John Edwin Garcia Serna",sqf:427},
+  "707":{o:"Priyesh Mukesh & Sukhdeep K Bhandal",sqf:419},
+  "708":{o:"The 9301 Esther Meadows Building LLC",sqf:538}
+};
+const F={
+  23:[{n:"PH 2301",p:"OD",t:"1/1"},{n:"PH 2302",p:"OC",t:"1/1"},{n:"PH 2303",p:"V",t:"2/2+D"},{n:"PH 2304",p:"V",t:"2/2"}],
+  22:[{n:"2201",p:"V",t:"1/1"},{n:"2202",p:"OD",t:"1/1"},{n:"2203",p:"V",t:"2/2+D"},{n:"2204",p:"V",t:"2/2"}],
+  21:[{n:"2101",p:"V",t:"1/1"},{n:"2102",p:"V",t:"1/1"},{n:"2103",p:"V",t:"2/2+D"},{n:"2104",p:"OD",t:"2/2"}],
+  20:[{n:"2001",p:"V",t:"1/1"},{n:"2002",p:"OD",t:"1/1"},{n:"2003",p:"OD",t:"2/2+D"},{n:"2004",p:"OD",t:"2/2"}],
+  19:[{n:"1901",p:"OD",t:"2/2"},{n:"1902",p:"OD",t:"2/2+D"}],
+  18:[{n:"1801",p:"V",t:"2/2"},{n:"1802",p:"OD",t:"2/2+D"}],
+  17:[{n:"1701",p:"V",t:"1/1"},{n:"1702",p:"OD",t:"1/1"},{n:"1703",p:"V",t:"1/1+D"},{n:"1704",p:"OD",t:"1/1"},{n:"1705",p:"V",t:"1/1"}],
+  16:[{n:"1601",p:"OD",t:"1/1"},{n:"1602",p:"OD",t:"1/1"},{n:"1603",p:"OD",t:"1/1+D"},{n:"1604",p:"V",t:"1/1"},{n:"1605",p:"R",t:"1/1"}],
+  15:[{n:"1501",p:"OC",t:"1/1"},{n:"1502",p:"R",t:"1/1"},{n:"1503",p:"V",t:"1/1+D"},{n:"1504",p:"R",t:"1/1"},{n:"1505",p:"V",t:"1/1"}],
+  14:[{n:"1401",p:"OD",t:"1/1"},{n:"1402",p:"V",t:"1/1"},{n:"1403",p:"V",t:"1/1+D"},{n:"1404",p:"V",t:"1/1"},{n:"1405",p:"OD",t:"1/1"}],
+  12:[{n:"1201",p:"V",t:"1/1"},{n:"1202",p:"V",t:"1/1"},{n:"1203",p:"V",t:"1/1+D"},{n:"1204",p:"V",t:"1/1"},{n:"1205",p:"V",t:"1/1"}],
+  11:[{n:"1101",p:"V",t:"1/1"},{n:"1102",p:"V",t:"1/1"},{n:"1103",p:"OD",t:"1/1+D"},{n:"1104",p:"V",t:"1/1"},{n:"1105",p:"OD",t:"1/1"}],
+  7:[{n:"701",p:"V",t:"Studio"},{n:"702",p:"V",t:"Studio"},{n:"703",p:"OD",t:"Studio"},{n:"704",p:"V",t:"Studio"},{n:"705",p:"V",t:"Studio"},{n:"706",p:"V",t:"Studio"},{n:"707",p:"V",t:"Studio"},{n:"708",p:"V",t:"Studio"}],
+  6:[{n:"601",p:"V",t:"Studio"},{n:"602",p:"V",t:"Studio"},{n:"603",p:"V",t:"Studio"},{n:"604",p:"OD",t:"Studio"},{n:"605",p:"V",t:"Studio"},{n:"606",p:"V",t:"Studio"},{n:"607",p:"OD",t:"Studio"},{n:"608",p:"OD",t:"Studio"}],
+  5:[{n:"501",p:"OD",t:"Studio"},{n:"502",p:"OD",t:"Studio"},{n:"503",p:"OD",t:"Studio"},{n:"504",p:"OD",t:"Studio"},{n:"505",p:"OD",t:"Studio"},{n:"506",p:"OD",t:"Studio"},{n:"507",p:"V",t:"Studio"},{n:"508",p:"V",t:"Studio"}],
+  4:[{n:"401",p:"V",t:"Studio"},{n:"402",p:"OD",t:"Studio"},{n:"403",p:"OD",t:"Studio"},{n:"404",p:"OD",t:"Studio"},{n:"405",p:"V",t:"Studio"},{n:"406",p:"OD",t:"Studio"},{n:"407",p:"OD",t:"Studio"},{n:"408",p:"V",t:"Studio"}],
+  3:[{n:"301",p:"OD",t:"Studio"},{n:"302",p:"V",t:"Studio"},{n:"303",p:"V",t:"Studio"},{n:"304",p:"V",t:"Studio"},{n:"305",p:"V",t:"Studio"},{n:"306",p:"V",t:"Studio"},{n:"307",p:"V",t:"Studio"},{n:"308",p:"V",t:"Studio"},{n:"309",p:"V",t:"Studio"}],
+  2:[{n:"201",p:"OD",t:"Studio"},{n:"202",p:"OD",t:"Studio"},{n:"203",p:"V",t:"Studio"},{n:"204",p:"V",t:"Studio"},{n:"205",p:"OD",t:"Studio"},{n:"206",p:"V",t:"Studio"},{n:"207",p:"OD",t:"Studio"},{n:"208",p:"V",t:"Studio"},{n:"209",p:"OD",t:"Studio"}]
+};
+const C=[23,22,21,20,19,18,17,16,15,14,12,11];
+const L=[7,6,5,4,3,2];
+const sec={};
+C.forEach(f=>F[f].forEach(u=>{sec[u.n]={floor:f,s:'Condo'}}));
+L.forEach(f=>F[f].forEach(u=>{sec[u.n]={floor:f,s:'Lodging'}}));
+let selEl=null;
+
+function showDetail(u,el){
+  if(selEl)selEl.classList.remove('selected');
+  selEl=el;el.classList.add('selected');
+  const pg=P[u.p],s=sec[u.n],d=D[u.n]||{};
+  const pmBlock=(d.pm||d.pmc||d.pme)?`
+    <div class="d-section">
+      <div class="d-section-hd">Property Manager</div>
+      ${d.pm?`<div class="d-row"><span class="d-label">PM</span><span class="d-value">${d.pm}</span></div>`:''}
+      ${d.pmc?`<div class="d-row"><span class="d-label">Contact</span><span class="d-value">${d.pmc}</span></div>`:''}
+      ${d.pme?`<div class="d-email">${d.pme}</div>`:''}
+      ${d.pmp?`<div class="d-phone">&#128222; ${d.pmp}</div>`:''}
+    </div>`:'';
+  document.getElementById('detail-area').innerHTML=`
+    <div class="detail-card">
+      <div class="d-unit-row"><div class="d-unit-num">Unit ${u.n}</div><div class="d-badge" style="background:${pg.color};color:${pg.tc}">${u.p}</div></div>
+      <div class="d-div"></div>
+      <div class="d-row"><span class="d-label">Floor</span><span class="d-value">${s.floor}</span></div>
+      <div class="d-row"><span class="d-label">Section</span><span class="d-value">${s.s}</span></div>
+      <div class="d-row"><span class="d-label">Unit type</span><span class="d-value">${u.t}</span></div>
+      ${d.sqf?`<div class="d-row"><span class="d-label">Net sq ft</span><span class="d-value">${d.sqf.toLocaleString()} SF</span></div>`:''}
+      <div class="d-row"><span class="d-label">Program</span><span class="d-value">${pg.label}</span></div>
+      <div class="d-section">
+        <div class="d-section-hd">Owner</div>
+        <div class="d-owner-val">${d.o||'—'}</div>
+      </div>
+      ${pmBlock}
+    </div>`;
+}
+
+function row(f){return `<div class="fr"><div class="fn">${f}</div><div class="ur">${F[f].map(u=>`<div class="u" style="background:${P[u.p].color};color:${P[u.p].tc}" data-n="${u.n}"><div class="un">${u.n}</div><div class="ut">${u.t}</div></div>`).join('')}</div></div>`;}
+function sh(t){return `<div class="sec-hd">${t}</div>`;}
+let h='';
+h+=sh('Condo Floors');C.forEach(f=>h+=row(f));
+h+=`<div class="pool"><div class="pool-n">8–10</div><div class="pool-b">Pool · Spa · Gym — Amenity Deck</div></div>`;
+h+=sh('Lodging Floors');L.forEach(f=>h+=row(f));
+document.getElementById('map').innerHTML=h;
+
+const allU={};
+[...C,...L].forEach(f=>F[f].forEach(u=>{allU[u.n]=u;}));
+document.querySelectorAll('.u').forEach(el=>{el.addEventListener('click',()=>showDetail(allU[el.dataset.n],el));});
+
+document.getElementById('legend').innerHTML=Object.entries(P).map(([k,v])=>`<div class="li"><div class="ls" style="background:${v.color}"></div><div><div class="ll">${v.label}</div><div class="lc">${k}</div></div></div>`).join('');
+
+const cnt={};
+[...C,...L].forEach(f=>F[f].forEach(u=>{cnt[u.p]=(cnt[u.p]||0)+1}));
+const tot=Object.values(cnt).reduce((a,b)=>a+b,0);
+document.getElementById('summary').innerHTML=Object.entries(P).map(([k,v])=>{const n=cnt[k]||0,pct=Math.round(n/tot*100);return `<div class="sr"><div class="sd" style="background:${v.color}"></div><div class="sn">${k}</div><div class="sc">${n}</div><div class="sp">${pct}%</div></div><div class="bw"><div class="bf" style="width:${pct}%;background:${v.color}"></div></div>`;}).join('')+`<div class="stot">Total: ${tot} units</div>`;
+</script>
+</body>
+</html>
