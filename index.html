@@ -22,11 +22,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f6f8;padding:24px;col
 .fr{display:flex;align-items:center;gap:5px;margin-bottom:3px}
 .fn{width:38px;text-align:center;font-size:11px;font-weight:700;color:#4a5568;flex-shrink:0;background:#f0f2f5;border-radius:4px;padding:3px 0;line-height:1.3}
 .ur{display:flex;gap:3px}
-.u{width:62px;padding:5px 3px 4px;border-radius:4px;text-align:center;flex-shrink:0;cursor:pointer;transition:filter .15s,transform .15s,box-shadow .15s;outline:2px solid transparent}
+.u{width:62px;padding:5px 3px 4px;border-radius:4px;text-align:center;flex-shrink:0;cursor:pointer;transition:filter .15s,transform .15s,box-shadow .15s;outline:2px solid transparent;position:relative}
 .u:hover{filter:brightness(1.1);transform:scale(1.05);box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .u.selected{outline:2.5px solid #1a2744;transform:scale(1.07);box-shadow:0 3px 10px rgba(0,0,0,.2)}
 .un{font-size:9px;font-weight:700;line-height:1.3;pointer-events:none}
 .ut{font-size:7.5px;font-weight:500;line-height:1.2;margin-top:1.5px;opacity:.88;pointer-events:none}
+.uv{font-size:6.5px;font-weight:700;line-height:1.2;margin-top:1px;opacity:.72;pointer-events:none;letter-spacing:.03em}
 .pool{display:flex;align-items:center;gap:5px;margin:10px 0}
 .pool-n{width:38px;text-align:center;font-size:9px;font-weight:700;color:#2563b0;flex-shrink:0}
 .pool-b{flex:1;background:#dbeafe;border-radius:4px;padding:7px 10px;font-size:9.5px;font-weight:700;color:#1a4d8f;text-align:center;letter-spacing:.06em;text-transform:uppercase}
@@ -196,18 +197,18 @@ const D={
   'PH 2304':{o:'Linda Sofia Llc',sqf:742},
 };
 const F={
-  23:[{n:'PH 2301',p:'OD',t:'1/1'},{n:'PH 2302',p:'OC',t:'1/1'},{n:'PH 2303',p:'V',t:'2/2+D'},{n:'PH 2304',p:'V',t:'2/2'}],
-  22:[{n:'2201',p:'LB',t:'1/1'},{n:'2202',p:'OD',t:'1/1'},{n:'2203',p:'LB',t:'2/2+D'},{n:'2204',p:'LB',t:'2/2'}],
-  21:[{n:'2101',p:'V',t:'1/1'},{n:'2102',p:'V',t:'1/1'},{n:'2103',p:'OD',t:'2/2+D'},{n:'2104',p:'OD',t:'2/2'}],
-  20:[{n:'2001',p:'LB',t:'1/1'},{n:'2002',p:'OD',t:'1/1'},{n:'2003',p:'OD',t:'2/2+D'},{n:'2004',p:'OD',t:'2/2'}],
-  19:[{n:'1901',p:'OD',t:'2/2'},{n:'1902',p:'OD',t:'2/2+D'}],
-  18:[{n:'1801',p:'LB',t:'2/2'},{n:'1802',p:'OD',t:'2/2+D'}],
-  17:[{n:'1701',p:'HP',t:'1/1'},{n:'1702',p:'OD',t:'1/1'},{n:'1703',p:'OD',t:'1/1+D'},{n:'1704',p:'OD',t:'1/1'},{n:'1705',p:'V',t:'1/1'}],
-  16:[{n:'1601',p:'OD',t:'1/1'},{n:'1602',p:'OD',t:'1/1'},{n:'1603',p:'OD',t:'1/1+D'},{n:'1604',p:'V',t:'1/1'},{n:'1605',p:'R',t:'1/1'}],
-  15:[{n:'1501',p:'OC',t:'1/1'},{n:'1502',p:'R',t:'1/1'},{n:'1503',p:'LB',t:'1/1+D'},{n:'1504',p:'OC',t:'1/1'},{n:'1505',p:'LB',t:'1/1'}],
-  14:[{n:'1401',p:'OD',t:'1/1'},{n:'1402',p:'LB',t:'1/1'},{n:'1403',p:'HP',t:'1/1+D'},{n:'1404',p:'V',t:'1/1'},{n:'1405',p:'OD',t:'1/1'}],
-  12:[{n:'1201',p:'LB',t:'1/1'},{n:'1202',p:'HP',t:'1/1'},{n:'1203',p:'LB',t:'1/1+D'},{n:'1204',p:'HP',t:'1/1'},{n:'1205',p:'LB',t:'1/1'}],
-  11:[{n:'1101',p:'LB',t:'1/1'},{n:'1102',p:'LB',t:'1/1'},{n:'1103',p:'OD',t:'1/1+D'},{n:'1104',p:'V',t:'1/1'},{n:'1105',p:'OD',t:'1/1'}],
+  23:[{n:'PH 2301',p:'OD',t:'1/1',v:'SE'},{n:'PH 2302',p:'OC',t:'1/1',v:'SW'},{n:'PH 2303',p:'V',t:'2/2+D',v:'NW'},{n:'PH 2304',p:'V',t:'2/2',v:'NE'}],
+  22:[{n:'2201',p:'LB',t:'1/1',v:'SE'},{n:'2202',p:'OD',t:'1/1',v:'SW'},{n:'2203',p:'LB',t:'2/2+D',v:'NW'},{n:'2204',p:'LB',t:'2/2',v:'NE'}],
+  21:[{n:'2101',p:'V',t:'1/1',v:'SE'},{n:'2102',p:'V',t:'1/1',v:'SW'},{n:'2103',p:'OD',t:'2/2+D',v:'NW'},{n:'2104',p:'OD',t:'2/2',v:'NE'}],
+  20:[{n:'2001',p:'LB',t:'1/1',v:'SE'},{n:'2002',p:'OD',t:'1/1',v:'SW'},{n:'2003',p:'OD',t:'2/2+D',v:'NW'},{n:'2004',p:'OD',t:'2/2',v:'NE'}],
+  19:[{n:'1901',p:'OD',t:'2/2',v:'SE'},{n:'1902',p:'OD',t:'2/2+D',v:'NW'}],
+  18:[{n:'1801',p:'LB',t:'2/2',v:'SE'},{n:'1802',p:'OD',t:'2/2+D',v:'NW'}],
+  17:[{n:'1701',p:'HP',t:'1/1',v:'SE'},{n:'1702',p:'OD',t:'1/1',v:'SW'},{n:'1703',p:'OD',t:'1/1+D',v:'NW'},{n:'1704',p:'OD',t:'1/1',v:'N'},{n:'1705',p:'V',t:'1/1',v:'NE'}],
+  16:[{n:'1601',p:'OD',t:'1/1',v:'SE'},{n:'1602',p:'OD',t:'1/1',v:'SW'},{n:'1603',p:'OD',t:'1/1+D',v:'NW'},{n:'1604',p:'V',t:'1/1',v:'N'},{n:'1605',p:'R',t:'1/1',v:'NE'}],
+  15:[{n:'1501',p:'OC',t:'1/1',v:'SE'},{n:'1502',p:'R',t:'1/1',v:'SW'},{n:'1503',p:'LB',t:'1/1+D',v:'NW'},{n:'1504',p:'OC',t:'1/1',v:'N'},{n:'1505',p:'LB',t:'1/1',v:'NE'}],
+  14:[{n:'1401',p:'OD',t:'1/1',v:'SE'},{n:'1402',p:'LB',t:'1/1',v:'SW'},{n:'1403',p:'HP',t:'1/1+D',v:'NW'},{n:'1404',p:'V',t:'1/1',v:'N'},{n:'1405',p:'OD',t:'1/1',v:'NE'}],
+  12:[{n:'1201',p:'LB',t:'1/1',v:'SE'},{n:'1202',p:'HP',t:'1/1',v:'SW'},{n:'1203',p:'LB',t:'1/1+D',v:'NW'},{n:'1204',p:'HP',t:'1/1',v:'N'},{n:'1205',p:'LB',t:'1/1',v:'NE'}],
+  11:[{n:'1101',p:'LB',t:'1/1',v:'SE'},{n:'1102',p:'LB',t:'1/1',v:'SW'},{n:'1103',p:'OD',t:'1/1+D',v:'NW'},{n:'1104',p:'V',t:'1/1',v:'N'},{n:'1105',p:'OD',t:'1/1',v:'NE'}],
   7:[{n:'701',p:'LB',t:'Studio'},{n:'702',p:'LB',t:'Studio'},{n:'703',p:'OD',t:'Studio'},{n:'704',p:'LB',t:'Studio'},{n:'705',p:'HP',t:'Studio'},{n:'706',p:'LB',t:'Studio'},{n:'707',p:'LB',t:'Studio'},{n:'708',p:'HP',t:'Studio'}],
   6:[{n:'601',p:'LB',t:'Studio'},{n:'602',p:'V',t:'Studio'},{n:'603',p:'LB',t:'Studio'},{n:'604',p:'OD',t:'Studio'},{n:'605',p:'LB',t:'Studio'},{n:'606',p:'LB',t:'Studio'},{n:'607',p:'OD',t:'Studio'},{n:'608',p:'OD',t:'Studio'}],
   5:[{n:'501',p:'LB',t:'Studio'},{n:'502',p:'OD',t:'Studio'},{n:'503',p:'OD',t:'Studio'},{n:'504',p:'OD',t:'Studio'},{n:'505',p:'OD',t:'Studio'},{n:'506',p:'OD',t:'Studio'},{n:'507',p:'OD',t:'Studio'},{n:'508',p:'HP',t:'Studio'}],
@@ -241,6 +242,7 @@ function showDetail(u,el){
       <div class="d-row"><span class="d-label">Floor</span><span class="d-value">${s.floor}</span></div>
       <div class="d-row"><span class="d-label">Section</span><span class="d-value">${s.s}</span></div>
       <div class="d-row"><span class="d-label">Unit type</span><span class="d-value">${u.t}</span></div>
+      ${u.v?`<div class="d-row"><span class="d-label">View</span><span class="d-value">${u.v}</span></div>`:''}
       <div class="d-row"><span class="d-label">Program</span><span class="d-value">${pg.label}</span></div>
       ${d.sqf?`<div class="d-row"><span class="d-label">Sq. Ft.</span><span class="d-value">${d.sqf}</span></div>`:''}
       <div class="d-section">
@@ -251,7 +253,7 @@ function showDetail(u,el){
     </div>`;
 }
 
-function row(f){return `<div class="fr"><div class="fn">${f}</div><div class="ur">${F[f].map(u=>`<div class="u" style="background:${P[u.p].color};color:${P[u.p].tc}" data-n="${u.n}"><div class="un">${u.n}</div><div class="ut">${u.t}</div></div>`).join('')}</div></div>`;}
+function row(f){return `<div class="fr"><div class="fn">${f}</div><div class="ur">${F[f].map(u=>`<div class="u" style="background:${P[u.p].color};color:${P[u.p].tc}" data-n="${u.n}"><div class="un">${u.n}</div><div class="ut">${u.t}</div>${u.v?`<div class="uv">${u.v}</div>`:''}</div>`).join('')}</div></div>`;}
 function sh(t){return `<div class="sec-hd">${t}</div>`;}
 let h='';
 h+=sh('Condo Floors');C.forEach(f=>h+=row(f));
